@@ -1,14 +1,20 @@
 import { test } from '../fixtures/pages.fixture';
-import { AUTH_FILES } from '../data/seed-users';
-
-test.use({ storageState: AUTH_FILES.customer });
+import { registerViaApi } from '../data/api';
+import { createUser } from '../data/user.factory';
 
 test('buys a product and completes checkout', async ({
   productPage,
   cartPage,
   checkoutPage,
+  loginPage,
   page,
 }) => {
+  // Own account per test: independent of other tests, so safe under --shard.
+  const user = createUser();
+  await registerViaApi(user);
+  await loginPage.signIn(user);
+  await loginPage.expectSignedIn();
+
   const quantity = 2;
   const product = await productPage.openAnyProduct();
 

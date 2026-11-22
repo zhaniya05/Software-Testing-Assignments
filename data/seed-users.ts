@@ -13,7 +13,3 @@ export const CUSTOMER_2: Credentials = {
   password: process.env.CUSTOMER_2_PASSWORD ?? 'welcome01',
 };
 
-export const AUTH_FILES = {
-  customer: 'playwright/.auth/customer.json',
-  customer2: 'playwright/.auth/customer2.json',
-} as const;
