@@ -7,6 +7,9 @@ node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
+/reports/
+/all-blob-reports/
+/.act-artifacts/
 /playwright/.cache/
 /playwright/.auth/
 

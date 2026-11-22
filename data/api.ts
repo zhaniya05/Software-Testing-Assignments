@@ -1,7 +1,7 @@
 import { request } from '@playwright/test';
 import type { NewUser } from './user.factory';
 
-const API_URL = 'https://api.practicesoftwaretesting.com';
+const API_URL = process.env.API_URL ?? 'https://api.practicesoftwaretesting.com';
 
 /** Creates the account through the API so tests don't depend on shared demo accounts (which can get locked). */
 export async function registerViaApi(user: NewUser): Promise<void> {
