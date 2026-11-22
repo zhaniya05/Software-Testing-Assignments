@@ -59,9 +59,7 @@ export class CheckoutPage extends BasePage {
 
 
   async completeCheckout(): Promise<void> {
-    // Sign in — checkout opens on the sign-in step
-    await this.signInDuringCheckout();
-
+    // Already signed in via storageState, so the sign-in step is just a proceed
     // Billing address
     await this.proceedButton.click();
     await this.houseNumber.fill('12');

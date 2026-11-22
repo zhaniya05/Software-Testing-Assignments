@@ -1,9 +1,9 @@
 import { test } from '../fixtures/pages.fixture';
-import { CUSTOMER_2 } from '../data/seed-users';
+import { CUSTOMER } from '../data/seed-users';
 
 test.describe('Reset password', () => {
   test('a known email gets the confirmation', async ({ loginPage }) => {
-    await loginPage.requestPasswordReset(CUSTOMER_2.email);
+    await loginPage.requestPasswordReset(CUSTOMER.email);
     await loginPage.expectResetConfirmation();
   });
 

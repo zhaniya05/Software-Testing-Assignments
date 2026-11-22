@@ -7,5 +7,13 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   retries: process.env.CI ? 2 : 0,
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'setup', testMatch: /auth\.setup\.spec\.ts/ },
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /auth\.setup\.spec\.ts/,
+      dependencies: ['setup'],
+    },
+  ],
 });

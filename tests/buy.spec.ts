@@ -1,7 +1,7 @@
 import { test } from '../fixtures/pages.fixture';
 import { AUTH_FILES } from '../data/seed-users';
 
-test.use({ storageState: AUTH_FILES.customer2 });
+test.use({ storageState: AUTH_FILES.customer });
 
 test('buys a product and completes checkout', async ({
   productPage,

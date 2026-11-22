@@ -12,16 +12,16 @@ export class LoginPage extends BasePage {
 
   // inside class LoginPage
   private get resetEmailInput() {
-    return this.pending('forgot-password: email field');
+    return this.testId('email');
   }
   private get resetSubmitButton() {
-    return this.pending('forgot-password: submit button');
+    return this.testId('forgot-password-submit');
   }
   private get resetConfirmation() {
-    return this.pending('forgot-password: success confirmation');
+    return this.page.locator('.alert-success');
   }
   private get resetError() {
-    return this.pending('forgot-password: error message');
+    return this.testId('email-error');
   }
 
   async requestPasswordReset(email: string): Promise<void> {
