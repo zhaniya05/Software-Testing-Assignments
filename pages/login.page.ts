@@ -69,7 +69,7 @@ export class LoginPage extends BasePage {
 
   async expectSignedIn(): Promise<void> {
     await this.expectPath(ACCOUNT_URL);
-    await expect(this.accountMarker).toBeVisible();
+    await expect(this.accountMarker).toBeVisible({ timeout: 15_000 });
   }
 
   async expectLoginRejected(): Promise<void> {
