@@ -70,10 +70,10 @@ Tests are independent (each test that needs an account registers its own through
 
 | Configuration | Total run time | Run tests step (slowest shard) | Run |
 | --- | --- | --- | --- |
-| 1 job, no sharding | _TODO_ | _TODO_ | _TODO_ |
-| 4 shards + merge | _TODO_ | _TODO_ | _TODO_ |
+| 1 job, no sharding | 1 min 45 s | 11 s | [run](https://github.com/zhaniya05/Software-Testing-Assignments/actions/runs/45677888674) |
+| 4 shards + merge | 1 min 44 s | 5 s (slowest shard) | [run](https://github.com/zhaniya05/Software-Testing-Assignments/actions/runs/45679163330) |
 
-To fill in from real GitHub Actions runs (median of 3 `workflow_dispatch` runs). Conclusion: _TODO_ (with few fast tests the ~1 min setup per shard can cancel out the gain).
+One run per configuration so far (a median of 3 `workflow_dispatch` runs is still to be added). Conclusion: sharding cuts the test step from 11 s to 5 s, but the total run time stays about the same (~1 min 45 s), because every shard spends about 30 s starting its own copy of the app and the suite has only 9 fast tests.
 
 ### Running locally
 
