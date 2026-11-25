@@ -41,7 +41,12 @@ jobs:
         env:
           SPRINT: sprint5
           DISABLE_LOGGING: "true"
-        run: docker compose -f docker-compose.prod.yml up -d --pull missing
+        run: |
+          # The prebuilt web and cron images fail on the runner with "exec format error"
+          # (wrong CPU architecture). web is just nginx + vhost.conf, so build it here
+          # under the name the compose file expects; cron is not needed for the tests.
+          docker build -t testsmith/practice-software-testing-web -f _docker/web.docker _docker
+          docker compose -f docker-compose.prod.yml up -d --pull missing mariadb laravel-api angular-ui web
       - name: Prepare the app (database)
         working-directory: toolshop
         env:
