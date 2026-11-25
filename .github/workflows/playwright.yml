@@ -12,7 +12,7 @@ jobs:
   test:
     name: Tests (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -28,10 +28,60 @@ jobs:
         run: npm ci
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
+      # The public toolshop sits behind Cloudflare, which serves a bot challenge to
+      # GitHub runners. So each shard runs its own copy of the app (prebuilt images from
+      # docker-compose.prod.yml, sprint5, migrate + seed).
+      - name: Checkout the app under test
+        uses: actions/checkout@v4
+        with:
+          repository: testsmith-io/practice-software-testing
+          path: toolshop
+      - name: Start the app
+        working-directory: toolshop
+        env:
+          SPRINT: sprint5
+          DISABLE_LOGGING: "true"
+        run: |
+          # The prebuilt web and cron images fail on the runner with "exec format error"
+          # (wrong CPU architecture). web is just nginx + vhost.conf, so build it here
+          # under the name the compose file expects; cron is not needed for the tests.
+          docker build -t testsmith/practice-software-testing-web -f _docker/web.docker _docker
+          docker compose -f docker-compose.prod.yml up -d --pull missing mariadb laravel-api angular-ui web
+      - name: Prepare the app (database)
+        working-directory: toolshop
+        env:
+          SPRINT: sprint5
+          DISABLE_LOGGING: "true"
+        run: |
+          for i in $(seq 1 30); do
+            docker compose -f docker-compose.prod.yml exec -T mariadb mysqladmin ping -h localhost -u root -proot --silent 2>/dev/null && break
+            echo "waiting for MariaDB ($i/30)"; sleep 2
+          done
+          docker compose -f docker-compose.prod.yml exec -T laravel-api php artisan migrate:refresh --seed
+      - name: Wait for UI and API
+        working-directory: toolshop
+        env:
+          SPRINT: sprint5
+          DISABLE_LOGGING: "true"
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:4200 && curl -sf -o /dev/null "http://localhost:8091/products?page=1"; then
+              echo "app is up"; exit 0
+            fi
+            echo "waiting for app ($i/60)"; sleep 5
+          done
+          echo "---- API response body ----"
+          curl -s "http://localhost:8091/products?page=1" | head -c 1500 || true
+          echo; echo "---- Laravel log ----"
+          docker compose -f docker-compose.prod.yml exec -T laravel-api sh -c 'tail -n 40 storage/logs/laravel.log' || true
+          echo "---- container logs ----"
+          docker compose -f docker-compose.prod.yml logs --tail=40 || true
+          exit 1
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
-          BASE_URL: ${{ vars.BASE_URL }}
+          BASE_URL: http://localhost:4200
+          API_URL: http://localhost:8091
       - name: Upload blob report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4

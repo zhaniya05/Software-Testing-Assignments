@@ -62,6 +62,8 @@ npx playwright show-report
 
 **CI settings** (`playwright.config.ts`, when `CI=true`): `forbidOnly: true`, `retries: 2`, reporters `list`, `blob`, `junit`, `trace: 'on-first-retry'`.
 
+**Application under test in CI:** the public site practicesoftwaretesting.com serves a Cloudflare bot challenge to GitHub runners, so every shard starts its own copy of the app from the open-source [testsmith-io/practice-software-testing](https://github.com/testsmith-io/practice-software-testing) repository (Docker Compose, sprint5, migrate + seed) and the tests run against `BASE_URL=http://localhost:4200` and `API_URL=http://localhost:8091`. Locally the tests still default to the public site.
+
 Tests are independent (each test that needs an account registers its own through the API), so they are safe to split across shards.
 
 ### Runtime
